@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:convert';
 import 'package:image/image.dart' as img_lib;
+import 'package:archive/archive_io.dart';
 
 class CurvePoint {
   final int input;
@@ -445,137 +445,15 @@ img_lib.Image applyNcpToImage(img_lib.Image source, NcpFile ncp) {
   return output;
 }
 
-String generateReadmeText(NcpFile ncp, String filename, int fileLength) {
-  final sb = StringBuffer();
-  sb.writeln("# Nikon Custom Picture Control: ${ncp.name}");
-  sb.writeln("");
-  sb.writeln(
-      "Bộ lọc màu thiết lập chuyên dụng cho máy ảnh Nikon (được nạp trực tiếp vào máy ảnh hoặc qua phần mềm NX Studio).");
-  sb.writeln("");
-  sb.writeln("## 🖼️ Ảnh mô phỏng bộ lọc màu (ColorChecker Preview)");
-  sb.writeln(
-      "Bảng màu tiêu chuẩn ColorChecker so sánh giữa ảnh gốc và ảnh sau khi áp dụng bộ lọc màu:");
-  sb.writeln("");
-  sb.writeln("| Ảnh gốc (Original) | Đã áp dụng bộ lọc (Filtered) |");
-  sb.writeln("| :---: | :---: |");
-  sb.writeln(
-      "| ![Original](../colorchecker_original.jpg) | ![Filtered](preview.jpg) |");
-  sb.writeln("");
-  sb.writeln("## 📊 Thông tin tệp tin");
-  sb.writeln("- **Tên tệp**: `$filename`");
-  sb.writeln("- **Kích thước**: `$fileLength bytes`");
-  sb.writeln("- **Chữ ký**: `NCP\\x00` (Hợp lệ)");
-  sb.writeln("");
-  sb.writeln("## ⚙️ Các thông số Slider");
-  sb.writeln("| Tham số | Thiết lập | Mô tả |");
-  sb.writeln("| --- | --- | --- |");
-  sb.writeln(
-      "| **Profile gốc** | `${getBaseProfileName(ncp.baseProfileId)}` | Cấu hình màu nền |");
-  sb.writeln(
-      "| **Sharpening (Độ nét)** | `${formatParam(ncp.sharpening)}` | Độ sắc nét chi tiết |");
-  sb.writeln(
-      "| **Contrast (Tương phản)** | `${formatParam(ncp.contrast, isCurve: true)}` | Độ tương phản sắc độ |");
-  sb.writeln(
-      "| **Brightness (Độ sáng)** | `${formatParam(ncp.brightness, isCurve: true)}` | Sắc độ sáng |");
-  sb.writeln(
-      "| **Saturation (Độ rực màu)** | `${formatParam(ncp.saturation)}` | Độ bão hòa màu sắc |");
-  sb.writeln(
-      "| **Hue (Tông màu)** | `${formatParam(ncp.hue)}` | Độ lệch dải tông màu |");
-
-  if (ncp.baseProfileId == 0x064D) {
-    final filters = {
-      0: 'OFF',
-      1: 'YELLOW',
-      2: 'ORANGE',
-      3: 'RED',
-      4: 'GREEN',
-      0xFF: 'N/A'
-    };
-    final toningStyles = {
-      0: 'B/W (Trắng đen)',
-      1: 'SEPIA (Nâu đỏ)',
-      2: 'CYANOTYPE (Xanh lục)',
-      3: 'RED',
-      4: 'YELLOW',
-      5: 'GREEN',
-      6: 'BLUE GREEN',
-      7: 'BLUE',
-      8: 'PURPLE BLUE',
-      9: 'RED PURPLE',
-      0xFF: 'N/A'
-    };
-    sb.writeln(
-        "| **Monochrome Filter** | `${filters[ncp.filter] ?? 'N/A'}` | Kính lọc màu |");
-    sb.writeln(
-        "| **Monochrome Toning** | `${toningStyles[ncp.toning] ?? 'N/A'}` | Tông màu nhuộm đơn sắc |");
-    sb.writeln(
-        "| **Toning Strength** | `${ncp.toning == 0xFF ? 'N/A' : ncp.toningStrength}` | Độ đậm nhạt màu đơn sắc |");
-  }
-
-  sb.writeln("");
-  sb.writeln("## 📈 Đường cong tùy chọn (Custom Tone Curve)");
-  sb.writeln("- **Điểm đen đầu vào (Black Point)**: `${ncp.inputBlackPoint}`");
-  sb.writeln(
-      "- **Điểm trắng đầu vào (White Point)**: `${ncp.inputWhitePoint}`");
-  sb.writeln("- **Ngõ ra tối thiểu (Out Min)**: `${ncp.outputMin}`");
-  sb.writeln("- **Ngõ ra tối đa (Out Max)**: `${ncp.outputMax}`");
-  sb.writeln(
-      "- **Điểm trung tính Halftone**: `${ncp.halftone.toStringAsFixed(2)}`");
-  sb.writeln("- **Số điểm mốc vẽ**: `${ncp.curvePoints.length}`");
-  sb.writeln("");
-
-  if (ncp.curvePoints.isNotEmpty) {
-    sb.writeln("| Mốc | Đầu vào | Đầu ra |");
-    sb.writeln("| --- | --- | --- |");
-    for (int i = 0; i < ncp.curvePoints.length; i++) {
-      final pt = ncp.curvePoints[i];
-      sb.writeln("| Mốc $i | ${pt.input} | ${pt.output} |");
-    }
-    sb.writeln("");
-  }
-
-  sb.writeln("## 📉 Đồ thị ánh xạ độ sáng (LUT - 256 Entries)");
-  sb.writeln("Đồ thị thu gọn minh họa mức độ ánh xạ độ sáng (0 -> 32767):");
-  sb.writeln("```text");
-  for (int i = 0; i < 16; i++) {
-    final inputIdx = (i * 255 ~/ 15);
-    final outVal = ncp.lut[inputIdx];
-    final barLength = (outVal * 30 ~/ 32767);
-    final bar = '#' * barLength + '.' * (30 - barLength);
-    sb.writeln(
-        "Input ${inputIdx.toString().padLeft(3)} => Output ${outVal.toString().padLeft(5)} |$bar|");
-  }
-  sb.writeln("```");
-
-  return sb.toString();
-}
-
 void writeProfile(NcpFile ncp, String baseName, int blackOffset) {
   ncp.generateLut(blackOffset);
   final bytes = ncp.toBytes();
 
-  final targetDir = 'filters/$baseName';
-  Directory(targetDir).createSync(recursive: true);
-  Directory('filters').createSync(recursive: true);
-
-  // Xóa các tệp .png cũ nếu có để tránh rác repo
-  final oldOrigFile = File('filters/colorchecker_original.png');
-  if (oldOrigFile.existsSync()) {
-    try {
-      oldOrigFile.deleteSync();
-      print("Đã xóa tệp tin cũ: ${oldOrigFile.path}");
-    } catch (_) {}
-  }
-  final oldPreviewFile = File('$targetDir/preview.png');
-  if (oldPreviewFile.existsSync()) {
-    try {
-      oldPreviewFile.deleteSync();
-      print("Đã xóa tệp tin cũ: ${oldPreviewFile.path}");
-    } catch (_) {}
-  }
+  Directory('CUSTOMPC').createSync(recursive: true);
+  Directory('previews').createSync(recursive: true);
 
   // Tạo ảnh ColorChecker gốc dạng JPEG chất lượng cao nếu chưa tồn tại
-  final origFile = File('filters/colorchecker_original.jpg');
+  final origFile = File('previews/colorchecker_original.jpg');
   late img_lib.Image originalImage;
   if (!origFile.existsSync()) {
     originalImage = createColorChecker();
@@ -585,23 +463,32 @@ void writeProfile(NcpFile ncp, String baseName, int blackOffset) {
     originalImage = img_lib.decodeJpg(origFile.readAsBytesSync())!;
   }
 
-  // Áp dụng bộ lọc và lưu ảnh xem trước (preview.jpg)
+  // Áp dụng bộ lọc và lưu ảnh xem trước
   final previewImage = applyNcpToImage(originalImage, ncp);
-  final previewFile = File('$targetDir/preview.jpg');
+  final previewFile = File('previews/$baseName.jpg');
   previewFile.writeAsBytesSync(img_lib.encodeJpg(previewImage, quality: 95));
   print("Đã tạo hình ảnh xem trước: ${previewFile.path}");
 
-  // Save NCP file to filters/baseName/baseName.NCP
-  final ncpFile = File('$targetDir/$baseName.NCP');
+  // Lưu file NCP vào thư mục CUSTOMPC
+  final ncpFile = File('CUSTOMPC/$baseName.NCP');
   ncpFile.writeAsBytesSync(bytes);
   print("Đã tạo tệp tin Picture Control: ${ncpFile.path}");
-
-  // Save README.md file (UTF-8 encoded)
-  final readmeText = generateReadmeText(ncp, '$baseName.NCP', bytes.length);
-  final readmeFile = File('$targetDir/README.md');
-  readmeFile.writeAsStringSync(readmeText, encoding: utf8);
-  print("Đã tạo tệp tin README.md: ${readmeFile.path}");
   print("------------------------------------------------------------");
+}
+
+void createZipArchive() {
+  print("=============================================================");
+  print(" ĐANG TẠO TỆP TIN ZIP: CUSTOMPC.zip");
+  print("=============================================================");
+  try {
+    final encoder = ZipFileEncoder();
+    encoder.create('CUSTOMPC.zip');
+    encoder.addDirectory(Directory('CUSTOMPC'));
+    encoder.close();
+    print("Đã tạo thành công file: CUSTOMPC.zip");
+  } catch (e) {
+    print("Lỗi khi tạo file zip: $e");
+  }
 }
 
 void main() {
@@ -891,6 +778,9 @@ void main() {
       CurvePoint(input: 255, output: 250), // Hạ nhẹ điểm trắng tối đa
     ];
   writeProfile(nn400, "NN400_NOSTALGIC_NEG", 130);
+
+  // Tạo file zip cho thư mục CUSTOMPC
+  createZipArchive();
 
   print("TẤT CẢ CÁC FILE ĐÃ ĐƯỢC TẠO THÀNH CÔNG!");
 }
