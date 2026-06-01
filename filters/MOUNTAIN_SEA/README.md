@@ -2,6 +2,13 @@
 
 Bộ lọc màu thiết lập chuyên dụng cho máy ảnh Nikon (được nạp trực tiếp vào máy ảnh hoặc qua phần mềm NX Studio).
 
+## 🖼️ Ảnh mô phỏng bộ lọc màu (ColorChecker Preview)
+Bảng màu tiêu chuẩn ColorChecker so sánh giữa ảnh gốc và ảnh sau khi áp dụng bộ lọc màu:
+
+| Ảnh gốc (Original) | Đã áp dụng bộ lọc (Filtered) |
+| :---: | :---: |
+| ![Original](../colorchecker_original.jpg) | ![Filtered](preview.jpg) |
+
 ## 📊 Thông tin tệp tin
 - **Tên tệp**: `MOUNTAIN_SEA.NCP`
 - **Kích thước**: `638 bytes`
