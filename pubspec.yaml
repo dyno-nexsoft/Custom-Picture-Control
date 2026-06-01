@@ -1,0 +1,8 @@
+name: npc_tools
+description: Tools for parsing and generating Nikon Picture Control files
+version: 1.0.0
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  image: ^4.1.3

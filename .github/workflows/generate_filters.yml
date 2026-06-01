@@ -6,7 +6,7 @@ on:
       - main
       - master
     paths:
-      - 'generate_filters.dart'
+      - 'bin/generate_filters.dart'
   workflow_dispatch: # Cho phép kích hoạt chạy thủ công từ giao diện GitHub
 
 jobs:
@@ -24,9 +24,12 @@ jobs:
       - name: Cài đặt Dart SDK
         uses: dart-lang/setup-dart@v1
 
+      - name: Cài đặt thư viện (Dependencies)
+        run: dart pub get
+
       - name: Chạy Script sinh mã màu (.NCP & README.md)
         run: |
-          dart run generate_filters.dart
+          dart run bin/generate_filters.dart
 
       - name: Commit và Push các thay đổi về repo
         run: |

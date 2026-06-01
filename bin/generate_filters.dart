@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:image/image.dart' as img_lib;
 
 class CurvePoint {
   final int input;
@@ -173,11 +174,292 @@ String formatParam(int byteVal, {bool isCurve = false}) {
   return (val >= 0) ? "+$val" : "$val";
 }
 
+List<double> rgbToHsv(int r, int g, int b) {
+  double rd = r / 255.0;
+  double gd = g / 255.0;
+  double bd = b / 255.0;
+
+  double max = rd;
+  if (gd > max) max = gd;
+  if (bd > max) max = bd;
+
+  double min = rd;
+  if (gd < min) min = gd;
+  if (bd < min) min = bd;
+
+  double h = 0.0;
+  double s = 0.0;
+  double v = max;
+
+  double d = max - min;
+  s = max == 0.0 ? 0.0 : d / max;
+
+  if (max != min) {
+    if (max == rd) {
+      h = (gd - bd) / d + (gd < bd ? 6.0 : 0.0);
+    } else if (max == gd) {
+      h = (bd - rd) / d + 2.0;
+    } else if (max == bd) {
+      h = (rd - gd) / d + 4.0;
+    }
+    h /= 6.0;
+  }
+
+  return [h * 360.0, s, v];
+}
+
+List<int> hsvToRgb(double h, double s, double v) {
+  double hd = h / 360.0;
+  int i = (hd * 6.0).floor();
+  double f = hd * 6.0 - i;
+  double p = v * (1.0 - s);
+  double q = v * (1.0 - f * s);
+  double t = v * (1.0 - (1.0 - f) * s);
+
+  double r = 0.0;
+  double g = 0.0;
+  double b = 0.0;
+
+  switch (i % 6) {
+    case 0:
+      r = v;
+      g = t;
+      b = p;
+      break;
+    case 1:
+      r = q;
+      g = v;
+      b = p;
+      break;
+    case 2:
+      r = p;
+      g = v;
+      b = t;
+      break;
+    case 3:
+      r = p;
+      g = q;
+      b = v;
+      break;
+    case 4:
+      r = t;
+      g = p;
+      b = v;
+      break;
+    case 5:
+      r = v;
+      g = p;
+      b = q;
+      break;
+  }
+
+  return [
+    (r * 255.0).round().clamp(0, 255),
+    (g * 255.0).round().clamp(0, 255),
+    (b * 255.0).round().clamp(0, 255),
+  ];
+}
+
+img_lib.Image createColorChecker() {
+  final img = img_lib.Image(width: 800, height: 670);
+  // Tô nền màu xám than sang trọng (Charcoal)
+  img_lib.fill(img, color: img_lib.ColorRgb8(32, 32, 32));
+
+  final patchColors = [
+    // Hàng 1
+    [115, 82, 68], [194, 150, 130], [98, 122, 157], [87, 108, 67],
+    [129, 128, 174], [103, 189, 170],
+    // Hàng 2
+    [223, 124, 47], [73, 91, 166], [193, 81, 95], [91, 59, 114], [180, 189, 64],
+    [238, 162, 52],
+    // Hàng 3
+    [35, 63, 147], [67, 149, 74], [175, 46, 53], [231, 189, 52], [187, 82, 149],
+    [8, 133, 161],
+    // Hàng 4
+    [243, 243, 242], [200, 200, 200], [160, 160, 160], [122, 122, 121],
+    [85, 85, 85], [52, 52, 52]
+  ];
+
+  final patchSize = 100;
+  final gap = 16;
+  final startX = 60;
+  final startY = 40;
+
+  // Vẽ lưới ô màu Macbeth
+  for (int row = 0; row < 4; row++) {
+    for (int col = 0; col < 6; col++) {
+      final color = patchColors[row * 6 + col];
+      final x = startX + col * (patchSize + gap);
+      final y = startY + row * (patchSize + gap);
+
+      // Vẽ viền đen bao quanh ô màu (2px rộng hơn)
+      img_lib.fillRect(img,
+          x1: x - 2,
+          y1: y - 2,
+          x2: x + patchSize + 2,
+          y2: y + patchSize + 2,
+          color: img_lib.ColorRgb8(0, 0, 0));
+
+      // Vẽ ô màu chính
+      img_lib.fillRect(img,
+          x1: x,
+          y1: y,
+          x2: x + patchSize,
+          y2: y + patchSize,
+          color: img_lib.ColorRgb8(color[0], color[1], color[2]));
+    }
+  }
+
+  // Vẽ 4 thanh dải màu chuyển (Gradients) ở bên dưới
+  final gradStartX = 60;
+  final gradWidth = 680;
+  final gradHeight = 18;
+
+  final gradConfigs = [
+    // [yStart, isGrayscale, isRed, isGreen, isBlue]
+    [520, true, false, false, false],
+    [548, false, true, false, false],
+    [576, false, false, true, false],
+    [604, false, false, false, true]
+  ];
+
+  for (final config in gradConfigs) {
+    final yStart = config[0] as int;
+    final yEnd = yStart + gradHeight;
+
+    // Vẽ viền đen 2px bao quanh thanh gradient
+    img_lib.fillRect(img,
+        x1: gradStartX - 2,
+        y1: yStart - 2,
+        x2: gradStartX + gradWidth + 2,
+        y2: yEnd + 2,
+        color: img_lib.ColorRgb8(0, 0, 0));
+
+    // Vẽ thanh màu chuyển sắc từng pixel dọc theo chiều rộng
+    for (int dx = 0; dx < gradWidth; dx++) {
+      final val = (dx * 255 ~/ (gradWidth - 1)).clamp(0, 255);
+      final r = (config[1] as bool || config[2] as bool) ? val : 0;
+      final g = (config[1] as bool || config[3] as bool) ? val : 0;
+      final b = (config[1] as bool || config[4] as bool) ? val : 0;
+
+      img_lib.fillRect(img,
+          x1: gradStartX + dx,
+          y1: yStart,
+          x2: gradStartX + dx,
+          y2: yEnd,
+          color: img_lib.ColorRgb8(r, g, b));
+    }
+  }
+
+  return img;
+}
+
+img_lib.Image applyNcpToImage(img_lib.Image source, NcpFile ncp) {
+  final output = source.clone();
+
+  final double sFactor = 1.0 + 0.15 * (ncp.saturation - 128);
+  final double hShift = 3.0 * (ncp.hue - 128);
+
+  for (final pixel in output) {
+    int r = pixel.r.toInt();
+    int g = pixel.g.toInt();
+    int b = pixel.b.toInt();
+
+    // 1. Áp dụng bảng tra cứu LUT (Luminance mapping)
+    int rLut = (ncp.lut[r] * 255 ~/ 32767).clamp(0, 255);
+    int gLut = (ncp.lut[g] * 255 ~/ 32767).clamp(0, 255);
+    int bLut = (ncp.lut[b] * 255 ~/ 32767).clamp(0, 255);
+
+    // 2. Áp dụng Saturation (độ bão hòa màu)
+    final double y = 0.299 * rLut + 0.587 * gLut + 0.114 * bLut;
+    int rSat = (y + sFactor * (rLut - y)).round().clamp(0, 255);
+    int gSat = (y + sFactor * (gLut - y)).round().clamp(0, 255);
+    int bSat = (y + sFactor * (bLut - y)).round().clamp(0, 255);
+
+    // 3. Áp dụng Hue shift (xoay vòng màu sắc)
+    if (hShift != 0.0) {
+      final hsv = rgbToHsv(rSat, gSat, bSat);
+      double newH = (hsv[0] + hShift) % 360.0;
+      if (newH < 0) newH += 360.0;
+      final rgb = hsvToRgb(newH, hsv[1], hsv[2]);
+      rSat = rgb[0];
+      gSat = rgb[1];
+      bSat = rgb[2];
+    }
+
+    // 4. Monochrome Filter & Toning (nếu là Monochrome)
+    if (ncp.baseProfileId == 0x064D) {
+      // Chuyển ảnh về đen trắng (grayscale) dựa trên kính lọc màu
+      double mono;
+      if (ncp.filter == 1) {
+        // YELLOW
+        mono = 0.35 * rSat + 0.55 * gSat + 0.10 * bSat;
+      } else if (ncp.filter == 2) {
+        // ORANGE
+        mono = 0.45 * rSat + 0.50 * gSat + 0.05 * bSat;
+      } else if (ncp.filter == 3) {
+        // RED
+        mono = 0.65 * rSat + 0.30 * gSat + 0.05 * bSat;
+      } else if (ncp.filter == 4) {
+        // GREEN
+        mono = 0.20 * rSat + 0.70 * gSat + 0.10 * bSat;
+      } else {
+        // OFF hoặc khác
+        mono = 0.299 * rSat + 0.587 * gSat + 0.114 * bSat;
+      }
+
+      int gray = mono.round().clamp(0, 255);
+
+      // Áp dụng Toning màu nếu được bật
+      if (ncp.toning != 0xFF && ncp.toning != 0) {
+        // Nhuộm tông màu đơn sắc
+        // Toning: 1 = Sepia (nâu đỏ), 2 = Cyanotype (xanh lục), ...
+        double tr = 1.0, tg = 1.0, tb = 1.0;
+        if (ncp.toning == 1) {
+          // SEPIA
+          tr = 1.15;
+          tg = 1.0;
+          tb = 0.85;
+        } else if (ncp.toning == 2) {
+          // CYANOTYPE
+          tr = 0.85;
+          tg = 1.0;
+          tb = 1.15;
+        }
+
+        final double str =
+            ncp.toningStrength / 4.0; // Toning strength từ 0 đến 4
+        rSat = (gray + (gray * (tr - 1.0)) * str).round().clamp(0, 255);
+        gSat = (gray + (gray * (tg - 1.0)) * str).round().clamp(0, 255);
+        bSat = (gray + (gray * (tb - 1.0)) * str).round().clamp(0, 255);
+      } else {
+        rSat = gSat = bSat = gray;
+      }
+    }
+
+    pixel.r = rSat;
+    pixel.g = gSat;
+    pixel.b = bSat;
+  }
+
+  return output;
+}
+
 String generateReadmeText(NcpFile ncp, String filename, int fileLength) {
   final sb = StringBuffer();
   sb.writeln("# Nikon Custom Picture Control: ${ncp.name}");
   sb.writeln("");
-  sb.writeln("Bộ lọc màu thiết lập chuyên dụng cho máy ảnh Nikon (được nạp trực tiếp vào máy ảnh hoặc qua phần mềm NX Studio).");
+  sb.writeln(
+      "Bộ lọc màu thiết lập chuyên dụng cho máy ảnh Nikon (được nạp trực tiếp vào máy ảnh hoặc qua phần mềm NX Studio).");
+  sb.writeln("");
+  sb.writeln("## 🖼️ Ảnh mô phỏng bộ lọc màu (ColorChecker Preview)");
+  sb.writeln(
+      "Bảng màu tiêu chuẩn ColorChecker so sánh giữa ảnh gốc và ảnh sau khi áp dụng bộ lọc màu:");
+  sb.writeln("");
+  sb.writeln("| Ảnh gốc (Original) | Đã áp dụng bộ lọc (Filtered) |");
+  sb.writeln("| :---: | :---: |");
+  sb.writeln(
+      "| ![Original](../colorchecker_original.jpg) | ![Filtered](preview.jpg) |");
   sb.writeln("");
   sb.writeln("## 📊 Thông tin tệp tin");
   sb.writeln("- **Tên tệp**: `$filename`");
@@ -187,34 +469,61 @@ String generateReadmeText(NcpFile ncp, String filename, int fileLength) {
   sb.writeln("## ⚙️ Các thông số Slider");
   sb.writeln("| Tham số | Thiết lập | Mô tả |");
   sb.writeln("| --- | --- | --- |");
-  sb.writeln("| **Profile gốc** | `${getBaseProfileName(ncp.baseProfileId)}` | Cấu hình màu nền |");
-  sb.writeln("| **Sharpening (Độ nét)** | `${formatParam(ncp.sharpening)}` | Độ sắc nét chi tiết |");
-  sb.writeln("| **Contrast (Tương phản)** | `${formatParam(ncp.contrast, isCurve: true)}` | Độ tương phản sắc độ |");
-  sb.writeln("| **Brightness (Độ sáng)** | `${formatParam(ncp.brightness, isCurve: true)}` | Sắc độ sáng |");
-  sb.writeln("| **Saturation (Độ rực màu)** | `${formatParam(ncp.saturation)}` | Độ bão hòa màu sắc |");
-  sb.writeln("| **Hue (Tông màu)** | `${formatParam(ncp.hue)}` | Độ lệch dải tông màu |");
-  
+  sb.writeln(
+      "| **Profile gốc** | `${getBaseProfileName(ncp.baseProfileId)}` | Cấu hình màu nền |");
+  sb.writeln(
+      "| **Sharpening (Độ nét)** | `${formatParam(ncp.sharpening)}` | Độ sắc nét chi tiết |");
+  sb.writeln(
+      "| **Contrast (Tương phản)** | `${formatParam(ncp.contrast, isCurve: true)}` | Độ tương phản sắc độ |");
+  sb.writeln(
+      "| **Brightness (Độ sáng)** | `${formatParam(ncp.brightness, isCurve: true)}` | Sắc độ sáng |");
+  sb.writeln(
+      "| **Saturation (Độ rực màu)** | `${formatParam(ncp.saturation)}` | Độ bão hòa màu sắc |");
+  sb.writeln(
+      "| **Hue (Tông màu)** | `${formatParam(ncp.hue)}` | Độ lệch dải tông màu |");
+
   if (ncp.baseProfileId == 0x064D) {
-    final filters = {0: 'OFF', 1: 'YELLOW', 2: 'ORANGE', 3: 'RED', 4: 'GREEN', 0xFF: 'N/A'};
-    final toningStyles = {
-      0: 'B/W (Trắng đen)', 1: 'SEPIA (Nâu đỏ)', 2: 'CYANOTYPE (Xanh lục)', 3: 'RED', 
-      4: 'YELLOW', 5: 'GREEN', 6: 'BLUE GREEN', 7: 'BLUE', 8: 'PURPLE BLUE', 9: 'RED PURPLE', 0xFF: 'N/A'
+    final filters = {
+      0: 'OFF',
+      1: 'YELLOW',
+      2: 'ORANGE',
+      3: 'RED',
+      4: 'GREEN',
+      0xFF: 'N/A'
     };
-    sb.writeln("| **Monochrome Filter** | `${filters[ncp.filter] ?? 'N/A'}` | Kính lọc màu |");
-    sb.writeln("| **Monochrome Toning** | `${toningStyles[ncp.toning] ?? 'N/A'}` | Tông màu nhuộm đơn sắc |");
-    sb.writeln("| **Toning Strength** | `${ncp.toning == 0xFF ? 'N/A' : ncp.toningStrength}` | Độ đậm nhạt màu đơn sắc |");
+    final toningStyles = {
+      0: 'B/W (Trắng đen)',
+      1: 'SEPIA (Nâu đỏ)',
+      2: 'CYANOTYPE (Xanh lục)',
+      3: 'RED',
+      4: 'YELLOW',
+      5: 'GREEN',
+      6: 'BLUE GREEN',
+      7: 'BLUE',
+      8: 'PURPLE BLUE',
+      9: 'RED PURPLE',
+      0xFF: 'N/A'
+    };
+    sb.writeln(
+        "| **Monochrome Filter** | `${filters[ncp.filter] ?? 'N/A'}` | Kính lọc màu |");
+    sb.writeln(
+        "| **Monochrome Toning** | `${toningStyles[ncp.toning] ?? 'N/A'}` | Tông màu nhuộm đơn sắc |");
+    sb.writeln(
+        "| **Toning Strength** | `${ncp.toning == 0xFF ? 'N/A' : ncp.toningStrength}` | Độ đậm nhạt màu đơn sắc |");
   }
 
   sb.writeln("");
   sb.writeln("## 📈 Đường cong tùy chọn (Custom Tone Curve)");
   sb.writeln("- **Điểm đen đầu vào (Black Point)**: `${ncp.inputBlackPoint}`");
-  sb.writeln("- **Điểm trắng đầu vào (White Point)**: `${ncp.inputWhitePoint}`");
+  sb.writeln(
+      "- **Điểm trắng đầu vào (White Point)**: `${ncp.inputWhitePoint}`");
   sb.writeln("- **Ngõ ra tối thiểu (Out Min)**: `${ncp.outputMin}`");
   sb.writeln("- **Ngõ ra tối đa (Out Max)**: `${ncp.outputMax}`");
-  sb.writeln("- **Điểm trung tính Halftone**: `${ncp.halftone.toStringAsFixed(2)}`");
+  sb.writeln(
+      "- **Điểm trung tính Halftone**: `${ncp.halftone.toStringAsFixed(2)}`");
   sb.writeln("- **Số điểm mốc vẽ**: `${ncp.curvePoints.length}`");
   sb.writeln("");
-  
+
   if (ncp.curvePoints.isNotEmpty) {
     sb.writeln("| Mốc | Đầu vào | Đầu ra |");
     sb.writeln("| --- | --- | --- |");
@@ -233,20 +542,55 @@ String generateReadmeText(NcpFile ncp, String filename, int fileLength) {
     final outVal = ncp.lut[inputIdx];
     final barLength = (outVal * 30 ~/ 32767);
     final bar = '#' * barLength + '.' * (30 - barLength);
-    sb.writeln("Input ${inputIdx.toString().padLeft(3)} => Output ${outVal.toString().padLeft(5)} |$bar|");
+    sb.writeln(
+        "Input ${inputIdx.toString().padLeft(3)} => Output ${outVal.toString().padLeft(5)} |$bar|");
   }
   sb.writeln("```");
-  
+
   return sb.toString();
 }
 
 void writeProfile(NcpFile ncp, String baseName, int blackOffset) {
   ncp.generateLut(blackOffset);
   final bytes = ncp.toBytes();
-  
+
   final targetDir = 'filters/$baseName';
   Directory(targetDir).createSync(recursive: true);
-  
+  Directory('filters').createSync(recursive: true);
+
+  // Xóa các tệp .png cũ nếu có để tránh rác repo
+  final oldOrigFile = File('filters/colorchecker_original.png');
+  if (oldOrigFile.existsSync()) {
+    try {
+      oldOrigFile.deleteSync();
+      print("Đã xóa tệp tin cũ: ${oldOrigFile.path}");
+    } catch (_) {}
+  }
+  final oldPreviewFile = File('$targetDir/preview.png');
+  if (oldPreviewFile.existsSync()) {
+    try {
+      oldPreviewFile.deleteSync();
+      print("Đã xóa tệp tin cũ: ${oldPreviewFile.path}");
+    } catch (_) {}
+  }
+
+  // Tạo ảnh ColorChecker gốc dạng JPEG chất lượng cao nếu chưa tồn tại
+  final origFile = File('filters/colorchecker_original.jpg');
+  late img_lib.Image originalImage;
+  if (!origFile.existsSync()) {
+    originalImage = createColorChecker();
+    origFile.writeAsBytesSync(img_lib.encodeJpg(originalImage, quality: 95));
+    print("Đã tạo tệp tin ColorChecker gốc: ${origFile.path}");
+  } else {
+    originalImage = img_lib.decodeJpg(origFile.readAsBytesSync())!;
+  }
+
+  // Áp dụng bộ lọc và lưu ảnh xem trước (preview.jpg)
+  final previewImage = applyNcpToImage(originalImage, ncp);
+  final previewFile = File('$targetDir/preview.jpg');
+  previewFile.writeAsBytesSync(img_lib.encodeJpg(previewImage, quality: 95));
+  print("Đã tạo hình ảnh xem trước: ${previewFile.path}");
+
   // Save NCP file to filters/baseName/baseName.NCP
   final ncpFile = File('$targetDir/$baseName.NCP');
   ncpFile.writeAsBytesSync(bytes);
@@ -274,10 +618,8 @@ void main() {
   final beachPortrait = NcpFile()
     ..name = "Beach Portrait"
     ..baseProfileId = 0x0486
-    ..sharpening =
-        131 // 128 + 3
-    ..saturation =
-        129 // 128 + 1
+    ..sharpening = 131 // 128 + 3
+    ..saturation = 129 // 128 + 1
     ..curvePoints = [
       CurvePoint(
         input: 0,
@@ -305,10 +647,8 @@ void main() {
   final mountainSea = NcpFile()
     ..name = "Mountain Sea"
     ..baseProfileId = 0x04C7
-    ..sharpening =
-        133 // 128 + 5
-    ..saturation =
-        130 // 128 + 2
+    ..sharpening = 133 // 128 + 5
+    ..saturation = 130 // 128 + 2
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
       CurvePoint(
@@ -334,12 +674,9 @@ void main() {
   final vintageLook = NcpFile()
     ..name = "Vintage Look"
     ..baseProfileId = 0x03C2
-    ..sharpening =
-        129 // 128 + 1
-    ..saturation =
-        126 // 128 - 2
-    ..hue =
-        129 // 128 + 1 (hơi ngả tone vàng ấm cổ điển)
+    ..sharpening = 129 // 128 + 1
+    ..saturation = 126 // 128 - 2
+    ..hue = 129 // 128 + 1 (hơi ngả tone vàng ấm cổ điển)
     ..curvePoints = [
       CurvePoint(
         input: 0,
@@ -365,12 +702,9 @@ void main() {
   final cineLook = NcpFile()
     ..name = "Cine Look"
     ..baseProfileId = 0x0001
-    ..sharpening =
-        131 // 128 + 3
-    ..saturation =
-        129 // 128 + 1
-    ..hue =
-        130 // 128 + 2 (tạo hiệu ứng chuyển đổi màu cam - teal rõ rệt hơn)
+    ..sharpening = 131 // 128 + 3
+    ..saturation = 129 // 128 + 1
+    ..hue = 130 // 128 + 2 (tạo hiệu ứng chuyển đổi màu cam - teal rõ rệt hơn)
     ..curvePoints = [
       CurvePoint(
         input: 0,
@@ -394,10 +728,8 @@ void main() {
   final classicChrome = NcpFile()
     ..name = "Classic Chrome"
     ..baseProfileId = 0x03C2
-    ..sharpening =
-        130 // 128 + 2
-    ..saturation =
-        127 // 128 - 1
+    ..sharpening = 130 // 128 + 2
+    ..saturation = 127 // 128 - 1
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
       CurvePoint(
@@ -422,12 +754,9 @@ void main() {
   final streetMono = NcpFile()
     ..name = "Street Mono"
     ..baseProfileId = 0x064D
-    ..sharpening =
-        132 // 128 + 4
-    ..filter =
-        3 // RED filter
-    ..toning =
-        0 // B/W style
+    ..sharpening = 132 // 128 + 4
+    ..filter = 3 // RED filter
+    ..toning = 0 // B/W style
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
       CurvePoint(input: 50, output: 25), // Ép shadows cực sâu (crush blacks)
@@ -513,8 +842,7 @@ void main() {
     ..baseProfileId = 0x0001
     ..sharpening = 130
     ..saturation = 129
-    ..hue =
-        126 // 128 - 2 (lệch tone ấm)
+    ..hue = 126 // 128 - 2 (lệch tone ấm)
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
       CurvePoint(input: 64, output: 58),
@@ -575,8 +903,7 @@ void main() {
     ..name = "Nostalgic Neg NN400"
     ..baseProfileId = 0x03C2
     ..sharpening = 130
-    ..hue =
-        127 // 128 - 1 (vàng ấm)
+    ..hue = 127 // 128 - 1 (vàng ấm)
     ..curvePoints = [
       CurvePoint(input: 0, output: 14), // Matte shadow nhẹ nhàng
       CurvePoint(input: 64, output: 70), // Làm mềm vùng tối trung tính
