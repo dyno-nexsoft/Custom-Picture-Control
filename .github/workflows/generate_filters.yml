@@ -1,0 +1,43 @@
+name: Auto-Generate Picture Control Filters
+
+on:
+  push:
+    branches:
+      - main
+      - master
+    paths:
+      - 'generate_filters.dart'
+  workflow_dispatch: # Cho phép kích hoạt chạy thủ công từ giao diện GitHub
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Quyền ghi bắt buộc để GitHub Action có thể commit và push ngược lại repository
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout mã nguồn
+        uses: actions/checkout@v4
+
+      - name: Cài đặt Dart SDK
+        uses: dart-lang/setup-dart@v1
+
+      - name: Chạy Script sinh mã màu (.NCP & .info)
+        run: |
+          dart run generate_filters.dart
+
+      - name: Commit và Push các thay đổi về repo
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add filters/
+          
+          # Chỉ commit và push khi thực sự có thay đổi trong thư mục filters/
+          if [ -n "$(git status --porcelain filters/)" ]; then
+            git commit -m "chore: tự động cập nhật bộ lọc màu .ncp và .info [skip ci]"
+            git push
+          else
+            echo "Không có thay đổi nào trong các bộ lọc màu, bỏ qua commit."
+          fi
