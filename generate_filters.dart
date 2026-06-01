@@ -173,90 +173,90 @@ String formatParam(int byteVal, {bool isCurve = false}) {
   return (val >= 0) ? "+$val" : "$val";
 }
 
-String generateInfoText(NcpFile ncp, String filename, int fileLength) {
+String generateReadmeText(NcpFile ncp, String filename, int fileLength) {
   final sb = StringBuffer();
-  sb.writeln("============================================================");
-  sb.writeln("         THÔNG TIN FILE NIKON PICTURE CONTROL (.NCP)        ");
-  sb.writeln("============================================================");
-  sb.writeln("Đường dẫn     : $filename");
-  sb.writeln("Kích thước    : $fileLength bytes");
-  sb.writeln("Chữ ký file   : NCP\\x00 (Hợp lệ)");
+  sb.writeln("# Nikon Custom Picture Control: ${ncp.name}");
   sb.writeln("");
-  sb.writeln("[1] CẤU HÌNH & THÔNG SỐ ĐIỀU CHỈNH");
-  sb.writeln("------------------------------------------------------------");
-  sb.writeln("Phiên bản     : ${ncp.version}");
-  sb.writeln("Tên Profile   : ${ncp.name}");
-  sb.writeln("Profile gốc   : ${getBaseProfileName(ncp.baseProfileId)}");
-  sb.writeln("Trạng thái    : Modified (Đã chỉnh sửa)");
+  sb.writeln("Bộ lọc màu thiết lập chuyên dụng cho máy ảnh Nikon (được nạp trực tiếp vào máy ảnh hoặc qua phần mềm NX Studio).");
   sb.writeln("");
-  sb.writeln("-- Các thông số Slider --");
-  sb.writeln("Sharpening    : ${formatParam(ncp.sharpening)}");
-  sb.writeln("Contrast      : ${formatParam(ncp.contrast, isCurve: true)}");
-  sb.writeln("Brightness    : ${formatParam(ncp.brightness, isCurve: true)}");
-  sb.writeln("Saturation    : ${formatParam(ncp.saturation)}");
-  sb.writeln("Hue           : ${formatParam(ncp.hue)}");
+  sb.writeln("## 📊 Thông tin tệp tin");
+  sb.writeln("- **Tên tệp**: `$filename`");
+  sb.writeln("- **Kích thước**: `$fileLength bytes`");
+  sb.writeln("- **Chữ ký**: `NCP\\x00` (Hợp lệ)");
   sb.writeln("");
-  sb.writeln("[2] THÔNG SỐ ĐƯỜNG CONG TÙY CHỈNH (CUSTOM TONE CURVE)");
-  sb.writeln("------------------------------------------------------------");
-  sb.writeln("Điểm đen đầu vào (Black Point) : ${ncp.inputBlackPoint}");
-  sb.writeln("Điểm trắng đầu vào (White Point): ${ncp.inputWhitePoint}");
-  sb.writeln("Giới hạn ngõ ra tối thiểu      : ${ncp.outputMin}");
-  sb.writeln("Giới hạn ngõ ra tối đa         : ${ncp.outputMax}");
-  sb.writeln(
-    "Điểm trung tính Halftone       : ${ncp.halftone.toStringAsFixed(2)}",
-  );
-  sb.writeln("Số điểm mốc vẽ Curve           : ${ncp.curvePoints.length}");
-
-  if (ncp.curvePoints.isNotEmpty) {
-    sb.writeln("Tọa độ các điểm mốc [Đầu vào -> Đầu ra (0-255)]:");
-    for (int i = 0; i < ncp.curvePoints.length; i++) {
-      final pt = ncp.curvePoints[i];
-      sb.writeln(
-        "  Mốc ${i.toString().padRight(2)}: ${pt.input.toString().padLeft(3)} -> ${pt.output.toString().padLeft(3)}",
-      );
-    }
+  sb.writeln("## ⚙️ Các thông số Slider");
+  sb.writeln("| Tham số | Thiết lập | Mô tả |");
+  sb.writeln("| --- | --- | --- |");
+  sb.writeln("| **Profile gốc** | `${getBaseProfileName(ncp.baseProfileId)}` | Cấu hình màu nền |");
+  sb.writeln("| **Sharpening (Độ nét)** | `${formatParam(ncp.sharpening)}` | Độ sắc nét chi tiết |");
+  sb.writeln("| **Contrast (Tương phản)** | `${formatParam(ncp.contrast, isCurve: true)}` | Độ tương phản sắc độ |");
+  sb.writeln("| **Brightness (Độ sáng)** | `${formatParam(ncp.brightness, isCurve: true)}` | Sắc độ sáng |");
+  sb.writeln("| **Saturation (Độ rực màu)** | `${formatParam(ncp.saturation)}` | Độ bão hòa màu sắc |");
+  sb.writeln("| **Hue (Tông màu)** | `${formatParam(ncp.hue)}` | Độ lệch dải tông màu |");
+  
+  if (ncp.baseProfileId == 0x064D) {
+    final filters = {0: 'OFF', 1: 'YELLOW', 2: 'ORANGE', 3: 'RED', 4: 'GREEN', 0xFF: 'N/A'};
+    final toningStyles = {
+      0: 'B/W (Trắng đen)', 1: 'SEPIA (Nâu đỏ)', 2: 'CYANOTYPE (Xanh lục)', 3: 'RED', 
+      4: 'YELLOW', 5: 'GREEN', 6: 'BLUE GREEN', 7: 'BLUE', 8: 'PURPLE BLUE', 9: 'RED PURPLE', 0xFF: 'N/A'
+    };
+    sb.writeln("| **Monochrome Filter** | `${filters[ncp.filter] ?? 'N/A'}` | Kính lọc màu |");
+    sb.writeln("| **Monochrome Toning** | `${toningStyles[ncp.toning] ?? 'N/A'}` | Tông màu nhuộm đơn sắc |");
+    sb.writeln("| **Toning Strength** | `${ncp.toning == 0xFF ? 'N/A' : ncp.toningStrength}` | Độ đậm nhạt màu đơn sắc |");
   }
 
   sb.writeln("");
-  sb.writeln("[3] BẢNG TRA CỨU ÁNH XẠ ĐỘ SÁNG (LUT - 256 Entries)");
-  sb.writeln("------------------------------------------------------------");
-  sb.writeln("Đồ thị thu gọn (Mức độ sáng đầu ra tương ứng từ 0-32767):");
+  sb.writeln("## 📈 Đường cong tùy chọn (Custom Tone Curve)");
+  sb.writeln("- **Điểm đen đầu vào (Black Point)**: `${ncp.inputBlackPoint}`");
+  sb.writeln("- **Điểm trắng đầu vào (White Point)**: `${ncp.inputWhitePoint}`");
+  sb.writeln("- **Ngõ ra tối thiểu (Out Min)**: `${ncp.outputMin}`");
+  sb.writeln("- **Ngõ ra tối đa (Out Max)**: `${ncp.outputMax}`");
+  sb.writeln("- **Điểm trung tính Halftone**: `${ncp.halftone.toStringAsFixed(2)}`");
+  sb.writeln("- **Số điểm mốc vẽ**: `${ncp.curvePoints.length}`");
+  sb.writeln("");
+  
+  if (ncp.curvePoints.isNotEmpty) {
+    sb.writeln("| Mốc | Đầu vào | Đầu ra |");
+    sb.writeln("| --- | --- | --- |");
+    for (int i = 0; i < ncp.curvePoints.length; i++) {
+      final pt = ncp.curvePoints[i];
+      sb.writeln("| Mốc $i | ${pt.input} | ${pt.output} |");
+    }
+    sb.writeln("");
+  }
 
+  sb.writeln("## 📉 Đồ thị ánh xạ độ sáng (LUT - 256 Entries)");
+  sb.writeln("Đồ thị thu gọn minh họa mức độ ánh xạ độ sáng (0 -> 32767):");
+  sb.writeln("```text");
   for (int i = 0; i < 16; i++) {
     final inputIdx = (i * 255 ~/ 15);
     final outVal = ncp.lut[inputIdx];
     final barLength = (outVal * 30 ~/ 32767);
     final bar = '#' * barLength + '.' * (30 - barLength);
-    sb.writeln(
-      "  Input ${inputIdx.toString().padLeft(3)} => Output ${outVal.toString().padLeft(5)} |$bar|",
-    );
+    sb.writeln("Input ${inputIdx.toString().padLeft(3)} => Output ${outVal.toString().padLeft(5)} |$bar|");
   }
-  sb.writeln("============================================================");
+  sb.writeln("```");
+  
   return sb.toString();
 }
 
 void writeProfile(NcpFile ncp, String baseName, int blackOffset) {
   ncp.generateLut(blackOffset);
   final bytes = ncp.toBytes();
-
-  // Ensure target directories exist
-  Directory('filters/ncp').createSync(recursive: true);
-  Directory('filters/info').createSync(recursive: true);
-
-  // Save NCP file to filters/ncp/
-  final ncpFile = File('filters/ncp/$baseName.NCP');
+  
+  final targetDir = 'filters/$baseName';
+  Directory(targetDir).createSync(recursive: true);
+  
+  // Save NCP file to filters/baseName/baseName.NCP
+  final ncpFile = File('$targetDir/$baseName.NCP');
   ncpFile.writeAsBytesSync(bytes);
   print("Đã tạo tệp tin Picture Control: ${ncpFile.path}");
 
-  // Save info file to filters/info/ (UTF-8 encoded)
-  final infoText = generateInfoText(
-    ncp,
-    'filters/ncp/$baseName.NCP',
-    bytes.length,
-  );
-  final infoFile = File('filters/info/$baseName.info');
-  infoFile.writeAsStringSync(infoText, encoding: utf8);
-  print("Đã tạo tệp tin thông tin tương ứng: ${infoFile.path}");
+  // Save README.md file (UTF-8 encoded)
+  final readmeText = generateReadmeText(ncp, '$baseName.NCP', bytes.length);
+  final readmeFile = File('$targetDir/README.md');
+  readmeFile.writeAsStringSync(readmeText, encoding: utf8);
+  print("Đã tạo tệp tin README.md: ${readmeFile.path}");
   print("------------------------------------------------------------");
 }
 
