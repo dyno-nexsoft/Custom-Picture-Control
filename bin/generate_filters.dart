@@ -769,30 +769,6 @@ void main() {
     ];
   writeProfile(streetMono, "STREET_MONO", 40);
 
-  // 7. PICCON15: Màu Flat gốc của bạn
-  // - Base Profile: NEUTRAL (0x03C2)
-  // - Sharpening: +0 (128)
-  // - Contrast & Brightness: Custom Curve
-  // - Saturation: -2 (126)
-  // - Hue: -2 (126)
-  // - Curve: Nâng vùng tối (0 -> 23), halftone 1.30
-  final flat = NcpFile()
-    ..name = "FLAT"
-    ..baseProfileId = 0x03C2
-    ..sharpening = 128
-    ..saturation = 126
-    ..hue = 126
-    ..halftone = 1.30
-    ..curvePoints = [
-      CurvePoint(input: 0, output: 23),
-      CurvePoint(input: 52, output: 50),
-      CurvePoint(input: 111, output: 111),
-      CurvePoint(input: 182, output: 175),
-      CurvePoint(input: 226, output: 217),
-      CurvePoint(input: 255, output: 255),
-    ];
-  writeProfile(flat, "PICCON15", 108);
-
   // 8. KP160 (Clear Negative - Kodak Portra 160 Emulation)
   // - Base Profile: PORTRAIT (0x0486)
   // - Sharpening: +2 (mềm mại, da hồng hào tự nhiên)
