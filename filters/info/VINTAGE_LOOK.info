@@ -1,0 +1,56 @@
+============================================================
+         THÔNG TIN FILE NIKON PICTURE CONTROL (.NCP)        
+============================================================
+Đường dẫn     : filters/ncp/VINTAGE_LOOK.NCP
+Kích thước    : 638 bytes
+Chữ ký file   : NCP\x00 (Hợp lệ)
+
+[1] CẤU HÌNH & THÔNG SỐ ĐIỀU CHỈNH
+------------------------------------------------------------
+Phiên bản     : 0100
+Tên Profile   : Vintage Look
+Profile gốc   : NEUTRAL (Trung tinh)
+Trạng thái    : Modified (Đã chỉnh sửa)
+
+-- Các thông số Slider --
+Sharpening    : +1
+Contrast      : Custom Curve (Duong cong tuy chinh)
+Brightness    : Custom Curve (Duong cong tuy chinh)
+Saturation    : -2
+Hue           : +1
+
+[2] THÔNG SỐ ĐƯỜNG CONG TÙY CHỈNH (CUSTOM TONE CURVE)
+------------------------------------------------------------
+Điểm đen đầu vào (Black Point) : 0
+Điểm trắng đầu vào (White Point): 255
+Giới hạn ngõ ra tối thiểu      : 0
+Giới hạn ngõ ra tối đa         : 255
+Điểm trung tính Halftone       : 1.00
+Số điểm mốc vẽ Curve           : 5
+Tọa độ các điểm mốc [Đầu vào -> Đầu ra (0-255)]:
+  Mốc 0 :   0 ->  25
+  Mốc 1 :  64 ->  75
+  Mốc 2 : 128 -> 128
+  Mốc 3 : 192 -> 180
+  Mốc 4 : 255 -> 245
+
+[3] BẢNG TRA CỨU ÁNH XẠ ĐỘ SÁNG (LUT - 256 Entries)
+------------------------------------------------------------
+Đồ thị thu gọn (Mức độ sáng đầu ra tương ứng từ 0-32767):
+  Input   0 => Output  3357 |###...........................|
+  Input  17 => Output  5055 |####..........................|
+  Input  34 => Output  6753 |######........................|
+  Input  51 => Output  8452 |#######.......................|
+  Input  68 => Output 10174 |#########.....................|
+  Input  85 => Output 11974 |##########....................|
+  Input 102 => Output 13774 |############..................|
+  Input 119 => Output 15574 |##############................|
+  Input 136 => Output 17359 |###############...............|
+  Input 153 => Output 19125 |#################.............|
+  Input 170 => Output 20891 |###################...........|
+  Input 187 => Output 22657 |####################..........|
+  Input 204 => Output 24760 |######################........|
+  Input 221 => Output 27003 |########################......|
+  Input 238 => Output 29245 |##########################....|
+  Input 255 => Output 31488 |############################..|
+============================================================
