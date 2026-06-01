@@ -464,5 +464,130 @@ void main() {
     ];
   writeProfile(flat, "PICCON15", 108);
 
+  // 8. KP160 (Clear Negative - Kodak Portra 160 Emulation)
+  // - Base Profile: PORTRAIT (0x0486)
+  // - Sharpening: +2 (mềm mại, da hồng hào tự nhiên)
+  // - Saturation: -1 (màu pastel nhẹ nhàng, thanh lịch)
+  // - Curve: Lift shadow nhẹ, nén sáng (airy look)
+  final kp160 = NcpFile()
+    ..name = "Clear Neg KP160"
+    ..baseProfileId = 0x0486
+    ..sharpening = 130
+    ..saturation = 127
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 6), // Lift nhẹ điểm đen
+      CurvePoint(input: 64, output: 68), // Làm sáng nhẹ vùng tối
+      CurvePoint(input: 128, output: 133), // Midtone sáng trong trẻo
+      CurvePoint(input: 192, output: 190), // Nén nhẹ vùng highlight
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(kp160, "KP160_CLEAR_NEG", 115);
+
+  // 9. KE100 (Rich Negative - Kodak Ektar 100 Emulation)
+  // - Base Profile: VIVID (0x00C3)
+  // - Sharpening: +4 (sắc nét, gai góc)
+  // - Saturation: +3 (màu cực kỳ rực rỡ, đỏ và xanh biển rực mạnh)
+  // - Curve: S-curve mạnh cho tương phản gắt gao, rực rỡ phong cảnh
+  final ke100 = NcpFile()
+    ..name = "Rich Neg KE100"
+    ..baseProfileId = 0x00C3
+    ..sharpening = 132
+    ..saturation = 131
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 0),
+      CurvePoint(input: 50, output: 35), // Dìm tối mạnh vùng shadow
+      CurvePoint(input: 128, output: 128),
+      CurvePoint(input: 192, output: 215), // Tăng sáng mạnh vùng highlight
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(ke100, "KE100_RICH_NEG", 60);
+
+  // 10. KG200 (Warm Negative - Kodak Gold 200 Emulation)
+  // - Base Profile: STANDARD (0x0001)
+  // - Sharpening: +2
+  // - Saturation: +1 (ấm áp)
+  // - Hue: -2 (tone màu vàng ấm cổ điển)
+  // - Curve: Midtone ấm, chuyển vùng mượt mà
+  final kg200 = NcpFile()
+    ..name = "Warm Neg KG200"
+    ..baseProfileId = 0x0001
+    ..sharpening = 130
+    ..saturation = 129
+    ..hue =
+        126 // 128 - 2 (lệch tone ấm)
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 0),
+      CurvePoint(input: 64, output: 58),
+      CurvePoint(input: 128, output: 130), // Nâng nhẹ vùng trung tính ấm
+      CurvePoint(input: 192, output: 196),
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(kg200, "KG200_WARM_NEG", 100);
+
+  // 11. NC100 (Classic Negative - Fujifilm Superia Emulation)
+  // - Base Profile: NEUTRAL (0x03C2)
+  // - Sharpening: +3
+  // - Saturation: -1 (màu trầm, lạnh ở vùng shadow)
+  // - Curve: Shadows cực sâu kết hợp highlight nổi bật
+  final nc100 = NcpFile()
+    ..name = "Classic Neg NC100"
+    ..baseProfileId = 0x03C2
+    ..sharpening = 131
+    ..saturation = 127
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 0),
+      CurvePoint(input: 50, output: 36), // Ép shadow sâu tạo khối sắc sảo
+      CurvePoint(input: 128, output: 125), // Dìm nhẹ lower-midtones
+      CurvePoint(input: 192, output: 206), // Đẩy highlight cao sáng rõ
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(nc100, "NC100_CLASSIC_NEG", 90);
+
+  // 12. CC200 (Classic Positive - Fujifilm Chrome Emulation)
+  // - Base Profile: NEUTRAL (0x03C2)
+  // - Sharpening: +3
+  // - Saturation: -2 (Màu lặng, ít rực rỡ nhưng chiều sâu lớn)
+  // - Curve: S-curve trầm mặc
+  final cc200 = NcpFile()
+    ..name = "Classic Pos CC200"
+    ..baseProfileId = 0x03C2
+    ..sharpening = 131
+    ..saturation = 126
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 0),
+      CurvePoint(input: 64, output: 52),
+      CurvePoint(
+        input: 128,
+        output: 120,
+      ), // Dìm sáng midtone cho ảnh đậm chất trầm mặc
+      CurvePoint(input: 192, output: 200),
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(cc200, "CC200_CLASSIC_POS", 110);
+
+  // 13. NN400 (Nostalgic Negative - Fujifilm Nostalgic Neg)
+  // - Base Profile: NEUTRAL (0x03C2)
+  // - Sharpening: +2
+  // - Saturation: +0
+  // - Hue: -1 (ngả vàng hổ phách nhẹ)
+  // - Curve: Điểm đen nâng cao (matte look), nén trắng tạo sắc hổ phách vàng ấm vùng sáng
+  final nn400 = NcpFile()
+    ..name = "Nostalgic Neg NN400"
+    ..baseProfileId = 0x03C2
+    ..sharpening = 130
+    ..hue =
+        127 // 128 - 1 (vàng ấm)
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 14), // Matte shadow nhẹ nhàng
+      CurvePoint(input: 64, output: 70), // Làm mềm vùng tối trung tính
+      CurvePoint(input: 128, output: 130), // Nâng nhẹ midtone tạo nước ảnh ấm
+      CurvePoint(
+        input: 192,
+        output: 188,
+      ), // Nén vùng highlight tạo sắc hổ phách cổ
+      CurvePoint(input: 255, output: 250), // Hạ nhẹ điểm trắng tối đa
+    ];
+  writeProfile(nn400, "NN400_NOSTALGIC_NEG", 130);
+
   print("TẤT CẢ CÁC FILE ĐÃ ĐƯỢC TẠO THÀNH CÔNG!");
 }
