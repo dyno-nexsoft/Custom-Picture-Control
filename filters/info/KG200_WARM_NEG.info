@@ -1,0 +1,56 @@
+============================================================
+         THÔNG TIN FILE NIKON PICTURE CONTROL (.NCP)        
+============================================================
+Đường dẫn     : filters/ncp/KG200_WARM_NEG.NCP
+Kích thước    : 638 bytes
+Chữ ký file   : NCP\x00 (Hợp lệ)
+
+[1] CẤU HÌNH & THÔNG SỐ ĐIỀU CHỈNH
+------------------------------------------------------------
+Phiên bản     : 0100
+Tên Profile   : Warm Neg KG200
+Profile gốc   : STANDARD (Tieu chuan)
+Trạng thái    : Modified (Đã chỉnh sửa)
+
+-- Các thông số Slider --
+Sharpening    : +2
+Contrast      : Custom Curve (Duong cong tuy chinh)
+Brightness    : Custom Curve (Duong cong tuy chinh)
+Saturation    : +1
+Hue           : -2
+
+[2] THÔNG SỐ ĐƯỜNG CONG TÙY CHỈNH (CUSTOM TONE CURVE)
+------------------------------------------------------------
+Điểm đen đầu vào (Black Point) : 0
+Điểm trắng đầu vào (White Point): 255
+Giới hạn ngõ ra tối thiểu      : 0
+Giới hạn ngõ ra tối đa         : 255
+Điểm trung tính Halftone       : 1.00
+Số điểm mốc vẽ Curve           : 5
+Tọa độ các điểm mốc [Đầu vào -> Đầu ra (0-255)]:
+  Mốc 0 :   0 ->   0
+  Mốc 1 :  64 ->  58
+  Mốc 2 : 128 -> 130
+  Mốc 3 : 192 -> 196
+  Mốc 4 : 255 -> 255
+
+[3] BẢNG TRA CỨU ÁNH XẠ ĐỘ SÁNG (LUT - 256 Entries)
+------------------------------------------------------------
+Đồ thị thu gọn (Mức độ sáng đầu ra tương ứng từ 0-32767):
+  Input   0 => Output   100 |..............................|
+  Input  17 => Output  2074 |#.............................|
+  Input  34 => Output  4047 |###...........................|
+  Input  51 => Output  6021 |#####.........................|
+  Input  68 => Output  8107 |#######.......................|
+  Input  85 => Output 10557 |#########.....................|
+  Input 102 => Output 13007 |###########...................|
+  Input 119 => Output 15457 |##############................|
+  Input 136 => Output 17811 |################..............|
+  Input 153 => Output 20056 |##################............|
+  Input 170 => Output 22302 |####################..........|
+  Input 187 => Output 24548 |######################........|
+  Input 204 => Output 26648 |########################......|
+  Input 221 => Output 28688 |##########################....|
+  Input 238 => Output 30727 |############################..|
+  Input 255 => Output 32767 |##############################|
+============================================================
