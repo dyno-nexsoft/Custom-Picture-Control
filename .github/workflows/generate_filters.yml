@@ -35,14 +35,26 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add CUSTOMPC/ previews/ CUSTOMPC.zip
+          git add CUSTOMPC/ previews/
           
           # Chỉ commit và push khi thực sự có thay đổi
-          if [ -n "$(git status --porcelain CUSTOMPC/ previews/ CUSTOMPC.zip)" ]; then
-            git commit -m "chore: tự động cập nhật bộ lọc màu .NCP, ảnh xem trước và ZIP [skip ci]"
+          if [ -n "$(git status --porcelain CUSTOMPC/ previews/)" ]; then
+            git commit -m "chore: tự động cập nhật bộ lọc màu .NCP và ảnh xem trước [skip ci]"
             git push
           else
             echo "Không có thay đổi nào trong các bộ lọc màu, bỏ qua commit."
           fi
+
+      - name: Tạo hoặc Cập nhật GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: "Latest Film Recipes Pack"
+          body: "Bản cập nhật tự động chứa toàn bộ 9 bộ lọc màu dạng file .NCP dưới dạng gói zip."
+          draft: false
+          prerelease: false
+          files: CUSTOMPC.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
