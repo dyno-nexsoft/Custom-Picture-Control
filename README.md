@@ -1,27 +1,24 @@
 # 📸 Nikon Custom Picture Control (NCP) Film Recipe Collection
 
-Kho lưu trữ các bộ lọc màu tùy chỉnh chuyên dụng dành cho máy ảnh Nikon (hỗ trợ cả các dòng Mirrorless Z-series và DSLR). Các bộ lọc màu được mô phỏng từ các cuộn phim cổ điển nổi tiếng của **Fujifilm** và **Kodak** (phát triển dựa trên các thuật toán xử lý giả lập màu sắc).
+Kho lưu trữ các bộ lọc màu tùy chỉnh chuyên dụng dành cho máy ảnh Nikon (hỗ trợ cả các dòng Mirrorless Z-series và DSLR). Các bộ lọc màu được mô phỏng từ các cấu hình màu giả lập phim của **Honor** và nghệ thuật ánh sáng của **Studio Harcourt** (phát triển dựa trên các thuật toán xử lý màu sắc của Fujifilm, Kodak và Harcourt).
 
 ---
 
-## 🎨 Danh sách 12 Bộ Lọc Màu (Profile Directory)
+## 🎨 Danh sách 9 Bộ Lọc Màu Honor & Harcourt (Profile Directory)
 
 Dưới đây là danh sách các cấu hình màu đã được thiết lập sẵn. Bạn có thể tải nhanh toàn bộ bộ lọc màu tại đây: [📥 Tải về toàn bộ (CUSTOMPC.zip)](CUSTOMPC.zip). Hoặc chọn tải riêng từng bộ lọc màu dưới bảng sau:
 
-|                 Ảnh xem trước (Preview)                  | Tên bộ lọc              | Profile gốc  | Phong cách mô phỏng                                        |                 Tải về                 |
-| :------------------------------------------------------: | :---------------------- | :----------- | :--------------------------------------------------------- | :------------------------------------: |
-|   <img src="previews/BEACH_PORTRAIT.jpg" width="160">    | **Beach Portrait**      | `PORTRAIT`   | Chân dung nắng biển, nâng sáng vùng tối                    |   [📥](CUSTOMPC/BEACH_PORTRAIT.NCP)    |
-|    <img src="previews/MOUNTAIN_SEA.jpg" width="160">     | **Mountain Sea**        | `LANDSCAPE`  | Phong cảnh núi biển trong vắt, độ tương phản và nét cao    |    [📥](CUSTOMPC/MOUNTAIN_SEA.NCP)     |
-|    <img src="previews/VINTAGE_LOOK.jpg" width="160">     | **Vintage Look**        | `NEUTRAL`    | Nước ảnh phim úa vàng ấm, phủ sương mờ (Matte shadow)      |    [📥](CUSTOMPC/VINTAGE_LOOK.NCP)     |
-|      <img src="previews/CINE_LOOK.jpg" width="160">      | **Cine Look**           | `STANDARD`   | Màu phim điện ảnh Teal & Orange trong trẻo                 |      [📥](CUSTOMPC/CINE_LOOK.NCP)      |
-|   <img src="previews/CLASSIC_CHROME.jpg" width="160">    | **Classic Chrome**      | `NEUTRAL`    | Giả lập màu Fujifilm Classic Chrome trầm mặc               |   [📥](CUSTOMPC/CLASSIC_CHROME.NCP)    |
-|     <img src="previews/STREET_MONO.jpg" width="160">     | **Street Mono**         | `MONOCHROME` | Đen trắng đường phố tương phản cực gắt kết hợp Kính lọc Đỏ |     [📥](CUSTOMPC/STREET_MONO.NCP)     |
-|   <img src="previews/KP160_CLEAR_NEG.jpg" width="160">   | **Clear Neg KP160**     | `PORTRAIT`   | Giả lập Kodak Portra 160: Tone da hồng hào, màu pastel dịu |   [📥](CUSTOMPC/KP160_CLEAR_NEG.NCP)   |
-|   <img src="previews/KE100_RICH_NEG.jpg" width="160">    | **Rich Neg KE100**      | `VIVID`      | Giả lập Kodak Ektar 100: Màu rực rỡ gắt gao cho phong cảnh |   [📥](CUSTOMPC/KE100_RICH_NEG.NCP)    |
-|   <img src="previews/KG200_WARM_NEG.jpg" width="160">    | **Warm Neg KG200**      | `STANDARD`   | Giả lập Kodak Gold 200: Tông vàng ấm áp cổ điển            |   [📥](CUSTOMPC/KG200_WARM_NEG.NCP)    |
-|  <img src="previews/NC100_CLASSIC_NEG.jpg" width="160">  | **Classic Neg NC100**   | `NEUTRAL`    | Giả lập Fujifilm Classic Negative (Superia): Shadows sâu   |  [📥](CUSTOMPC/NC100_CLASSIC_NEG.NCP)  |
-|  <img src="previews/CC200_CLASSIC_POS.jpg" width="160">  | **Classic Pos CC200**   | `NEUTRAL`    | Giả lập Fujifilm Classic Positive: Màu lặng sâu lắng       |  [📥](CUSTOMPC/CC200_CLASSIC_POS.NCP)  |
-| <img src="previews/NN400_NOSTALGIC_NEG.jpg" width="160"> | **Nostalgic Neg NN400** | `NEUTRAL`    | Giả lập Fujifilm Nostalgic Neg: Tone hổ phách vàng ấm      | [📥](CUSTOMPC/NN400_NOSTALGIC_NEG.NCP) |
+|                 Ảnh xem trước (Preview)                  | Tên bộ lọc              | Profile gốc  | Phong cách mô phỏng                                         |                 Tải về                 |
+| :------------------------------------------------------: | :---------------------- | :----------- | :---------------------------------------------------------- | :------------------------------------: |
+|   <img src="previews/KP160_CLEAR_NEG.jpg" width="160">   | **Clear Neg KP160**     | `PORTRAIT`   | Giả lập Kodak Portra 160: Tone da hồng hào, màu pastel dịu  |   [📥](CUSTOMPC/KP160_CLEAR_NEG.NCP)   |
+|   <img src="previews/KE100_RICH_NEG.jpg" width="160">    | **Rich Neg KE100**      | `VIVID`      | Giả lập Kodak Ektar 100: Màu rực rỡ gắt gao cho phong cảnh  |   [📥](CUSTOMPC/KE100_RICH_NEG.NCP)    |
+|   <img src="previews/KG200_WARM_NEG.jpg" width="160">    | **Warm Neg KG200**      | `STANDARD`   | Giả lập Kodak Gold 200: Tông vàng ấm áp cổ điển             |   [📥](CUSTOMPC/KG200_WARM_NEG.NCP)    |
+|  <img src="previews/NC100_CLASSIC_NEG.jpg" width="160">  | **Classic Neg NC100**   | `NEUTRAL`    | Giả lập Fujifilm Classic Negative (Superia): Shadows sâu    |  [📥](CUSTOMPC/NC100_CLASSIC_NEG.NCP)  |
+|  <img src="previews/CC200_CLASSIC_POS.jpg" width="160">  | **Classic Pos CC200**   | `NEUTRAL`    | Giả lập Fujifilm Classic Positive: Màu lặng sâu lắng        |  [📥](CUSTOMPC/CC200_CLASSIC_POS.NCP)  |
+| <img src="previews/NN400_NOSTALGIC_NEG.jpg" width="160"> | **Nostalgic Neg NN400** | `NEUTRAL`    | Giả lập Fujifilm Nostalgic Neg: Tone hổ phách vàng ấm       | [📥](CUSTOMPC/NN400_NOSTALGIC_NEG.NCP) |
+|  <img src="previews/HARCOURT_VIBRANT.jpg" width="160">   | **Harcourt Vibrant**    | `PORTRAIT`   | Harcourt Vibrant: Ánh sáng rực rỡ, chân dung phát sáng      |  [📥](CUSTOMPC/HARCOURT_VIBRANT.NCP)   |
+|  <img src="previews/HARCOURT_CLASSIC.jpg" width="160">   | **Harcourt Classic**    | `MONOCHROME` | Harcourt Classic: Trắng đen spotlight tương phản nghệ thuật |  [📥](CUSTOMPC/HARCOURT_CLASSIC.NCP)   |
+|   <img src="previews/HARCOURT_COLOUR.jpg" width="160">   | **Harcourt Colour**     | `PORTRAIT`   | Harcourt Colour: Tone màu ấm áp, saturation giảm mịn màng   |   [📥](CUSTOMPC/HARCOURT_COLOUR.NCP)   |
 
 ---
 

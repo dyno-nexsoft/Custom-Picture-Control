@@ -325,288 +325,192 @@ void main() {
   print(" BẮT ĐẦU TẠO CÁC BỘ LỌC MÀU CHUYÊN BIỆT (NIKON PICTURE CONTROL)");
   print("=============================================================\n");
 
-  // 1. BEACH_PORTRAIT: Chân dung đi biển
-  // - Base Profile: PORTRAIT (0x0486)
-  // - Sharpening: +3 (độ nét vừa phải cho chân dung da dẻ hồng hào)
-  // - Contrast & Brightness: Custom Curve (kéo sáng shadow để giảm tương phản gắt dưới nắng biển)
-  // - Saturation: +1 (tăng nhẹ độ bão hòa màu trời xanh và cát ấm)
-  // - Curve: Nâng nhẹ vùng tối (giúp mặt sáng đều), nén bớt vùng cháy sáng (highlight)
-  final beachPortrait = NcpFile()
-    ..name = "Beach Portrait"
-    ..baseProfileId = 0x0486
-    ..sharpening = 131 // 128 + 3
-    ..saturation = 129 // 128 + 1
-    ..curvePoints = [
-      CurvePoint(
-        input: 0,
-        output: 8,
-      ), // Nâng nhẹ điểm đen để tối sáng hơn, không bị bết
-      CurvePoint(
-        input: 50,
-        output: 56,
-      ), // Làm sáng vùng trung tính tối (shadows)
-      CurvePoint(input: 128, output: 135), // Làm sáng nhẹ da (midtones)
-      CurvePoint(
-        input: 200,
-        output: 195,
-      ), // Hạ nhẹ vùng sáng mạnh (highlights) để tránh cháy cát/nước
-      CurvePoint(input: 255, output: 255),
-    ];
-  writeProfile(beachPortrait, "BEACH_PORTRAIT", 120);
-
-  // 2. MOUNTAIN_SEA: Đi check-in núi biển (Phong cảnh sắc nét, trong trẻo)
-  // - Base Profile: LANDSCAPE (0x04C7)
-  // - Sharpening: +5 (tối đa chi tiết cây cối, sóng nước, vách đá)
-  // - Contrast & Brightness: Custom Curve (đường cong S-curve tương phản cao)
-  // - Saturation: +2 (độ rực rỡ cao cho rừng núi xanh lá và đại dương xanh dương)
-  // - Curve: Tăng độ tương phản bằng cách kéo sâu shadow và kích sáng highlight
-  final mountainSea = NcpFile()
-    ..name = "Mountain Sea"
-    ..baseProfileId = 0x04C7
-    ..sharpening = 133 // 128 + 5
-    ..saturation = 130 // 128 + 2
-    ..curvePoints = [
-      CurvePoint(input: 0, output: 0),
-      CurvePoint(
-        input: 64,
-        output: 50,
-      ), // Kéo sâu vùng tối tạo độ nổi khối (contrast)
-      CurvePoint(input: 128, output: 128),
-      CurvePoint(
-        input: 192,
-        output: 210,
-      ), // Kích sáng vùng trời mây tạo độ trong trẻo (clear sky)
-      CurvePoint(input: 255, output: 255),
-    ];
-  writeProfile(mountainSea, "MOUNTAIN_SEA", 60);
-
-  // 3. VINTAGE_LOOK: Màu ảnh phim hoài cổ (Matte shadow, màu hơi úa nhẹ cổ điển)
-  // - Base Profile: NEUTRAL (0x03C2)
-  // - Sharpening: +1 (mềm mại như chụp phim cổ)
-  // - Contrast & Brightness: Custom Curve
-  // - Saturation: -2 (Màu nhạt đặc trưng của phim cũ)
-  // - Hue: +1 (hơi nghiêng tone vàng ấm)
-  // - Curve: Nâng cực mạnh điểm đen tạo lớp phủ mờ (matte/faded shadow), nén chặt vùng sáng
-  final vintageLook = NcpFile()
-    ..name = "Vintage Look"
-    ..baseProfileId = 0x03C2
-    ..sharpening = 129 // 128 + 1
-    ..saturation = 126 // 128 - 2
-    ..hue = 129 // 128 + 1 (hơi ngả tone vàng ấm cổ điển)
-    ..curvePoints = [
-      CurvePoint(
-        input: 0,
-        output: 25,
-      ), // Nâng điểm đen cực cao tạo hiệu ứng sương mù/matte film
-      CurvePoint(input: 64, output: 75), // Phẳng hóa vùng tối trung tính
-      CurvePoint(input: 128, output: 128),
-      CurvePoint(input: 192, output: 180), // Nén vùng highlight tạo sự dịu mắt
-      CurvePoint(
-        input: 255,
-        output: 245,
-      ), // Hạ điểm trắng tối đa tránh chói lóa
-    ];
-  writeProfile(vintageLook, "VINTAGE_LOOK", 160);
-
-  // 4. CINE_LOOK: Màu phim điện ảnh Cine (Teal & Orange)
-  // - Base Profile: STANDARD (0x0001)
-  // - Sharpening: +3 (độ nét tốt)
-  // - Contrast & Brightness: Custom Curve
-  // - Saturation: +1 (màu rực rỡ điện ảnh)
-  // - Hue: +2 (dịch tông màu đỏ sang cam ấm và cyan sang xanh teal)
-  // - Curve: S-curve có nâng nhẹ điểm đen (shadow lift) tạo nước ảnh điện ảnh trong trẻo
-  final cineLook = NcpFile()
-    ..name = "Cine Look"
-    ..baseProfileId = 0x0001
-    ..sharpening = 131 // 128 + 3
-    ..saturation = 129 // 128 + 1
-    ..hue = 130 // 128 + 2 (tạo hiệu ứng chuyển đổi màu cam - teal rõ rệt hơn)
-    ..curvePoints = [
-      CurvePoint(
-        input: 0,
-        output: 10,
-      ), // Nâng nhẹ điểm đen tạo hiệu ứng mờ tối nhẹ
-      CurvePoint(input: 60, output: 50), // Nén nhẹ vùng tối trung tính
-      CurvePoint(input: 128, output: 130), // Đẩy sáng trung tính vùng da
-      CurvePoint(
-        input: 195,
-        output: 215,
-      ), // Kích sáng vùng highlight tạo độ tương phản trong vắt
-      CurvePoint(input: 255, output: 255),
-    ];
-  writeProfile(cineLook, "CINE_LOOK", 100);
-
-  // 5. CLASSIC_CHROME: Màu phim Fujifilm cổ điển (Classic Chrome)
-  // - Base Profile: NEUTRAL (0x03C2)
-  // - Sharpening: +2 (độ sắc nét vừa phải)
-  // - Saturation: -1 (màu trầm ấm, giảm bão hòa nhẹ)
-  // - Curve: S-curve mạnh, vùng highlight và shadow nén chặt tạo độ sâu hình ảnh
-  final classicChrome = NcpFile()
-    ..name = "Classic Chrome"
-    ..baseProfileId = 0x03C2
-    ..sharpening = 130 // 128 + 2
-    ..saturation = 127 // 128 - 1
-    ..curvePoints = [
-      CurvePoint(input: 0, output: 0),
-      CurvePoint(
-        input: 64,
-        output: 52,
-      ), // Dìm sâu shadow để tạo độ tương phản cao ở vùng tối
-      CurvePoint(
-        input: 128,
-        output: 122,
-      ), // Kéo nhẹ midtone xuống một chút để tạo sự trầm lắng
-      CurvePoint(input: 192, output: 205), // Đẩy highlight cao lên
-      CurvePoint(input: 255, output: 255),
-    ];
-  writeProfile(classicChrome, "CLASSIC_CHROME", 110);
-
-  // 6. STREET_MONO: Trắng đen tương phản cao (Street Monochrome)
-  // - Base Profile: MONOCHROME (0x064D)
-  // - Sharpening: +4 (độ sắc nét cực cao)
-  // - Filter: RED (0x03) (Kính lọc đỏ: dìm tối bầu trời xanh cực mạnh, tăng tương phản mây trắng và mặt)
-  // - Toning: B/W (0x00)
-  // - Curve: S-curve cực gắt tạo độ đen sâu thẳm và trắng cháy sáng cho ảnh đen trắng đường phố nghệ thuật
-  final streetMono = NcpFile()
-    ..name = "Street Mono"
-    ..baseProfileId = 0x064D
-    ..sharpening = 132 // 128 + 4
-    ..filter = 3 // RED filter
-    ..toning = 0 // B/W style
-    ..curvePoints = [
-      CurvePoint(input: 0, output: 0),
-      CurvePoint(input: 50, output: 25), // Ép shadows cực sâu (crush blacks)
-      CurvePoint(input: 128, output: 128),
-      CurvePoint(
-        input: 200,
-        output: 230,
-      ), // Kéo highlights cực sáng tạo tương phản mạnh
-      CurvePoint(input: 255, output: 255),
-    ];
-  writeProfile(streetMono, "STREET_MONO", 40);
-
-  // 8. KP160 (Clear Negative - Kodak Portra 160 Emulation)
+  // 1. KP160 (Clear Negative - Kodak Portra 160 Emulation)
   // - Base Profile: PORTRAIT (0x0486)
   // - Sharpening: +2 (mềm mại, da hồng hào tự nhiên)
-  // - Saturation: -1 (màu pastel nhẹ nhàng, thanh lịch)
-  // - Curve: Lift shadow nhẹ, nén sáng (airy look)
+  // - Saturation: -3 (màu pastel dịu nhẹ, ít rực rỡ)
+  // - Hue: +2 (lệch tone xanh mint lạnh và da hồng tự nhiên)
+  // - Curve: Lift shadow mạnh tạo nước ảnh airy film bay bổng
   final kp160 = NcpFile()
     ..name = "Clear Neg KP160"
     ..baseProfileId = 0x0486
     ..sharpening = 130
-    ..saturation = 127
+    ..saturation = 125 // 128 - 3
+    ..hue = 130 // 128 + 2
     ..curvePoints = [
-      CurvePoint(input: 0, output: 6), // Lift nhẹ điểm đen
-      CurvePoint(input: 64, output: 68), // Làm sáng nhẹ vùng tối
-      CurvePoint(input: 128, output: 133), // Midtone sáng trong trẻo
-      CurvePoint(input: 192, output: 190), // Nén nhẹ vùng highlight
+      CurvePoint(input: 0, output: 12), // Lift mạnh điểm đen tạo hiệu ứng mờ sương
+      CurvePoint(input: 64, output: 74), // Làm sáng mạnh shadow
+      CurvePoint(input: 128, output: 138), // Làm sáng vùng da (midtones) trong trẻo
+      CurvePoint(input: 192, output: 195), // Nén highlights dịu mắt
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(kp160, "KP160_CLEAR_NEG", 115);
 
-  // 9. KE100 (Rich Negative - Kodak Ektar 100 Emulation)
+  // 2. KE100 (Rich Negative - Kodak Ektar 100 Emulation)
   // - Base Profile: VIVID (0x00C3)
   // - Sharpening: +4 (sắc nét, gai góc)
-  // - Saturation: +3 (màu cực kỳ rực rỡ, đỏ và xanh biển rực mạnh)
-  // - Curve: S-curve mạnh cho tương phản gắt gao, rực rỡ phong cảnh
+  // - Saturation: +4 (màu rực rỡ đậm đà)
+  // - Hue: -1 (hơi lệch tone đỏ ấm áp)
+  // - Curve: S-curve gắt tạo độ sâu bóng tối lạnh và highlight rực rỡ
   final ke100 = NcpFile()
     ..name = "Rich Neg KE100"
     ..baseProfileId = 0x00C3
     ..sharpening = 132
-    ..saturation = 131
+    ..saturation = 132 // 128 + 4
+    ..hue = 127 // 128 - 1
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
-      CurvePoint(input: 50, output: 35), // Dìm tối mạnh vùng shadow
-      CurvePoint(input: 128, output: 128),
-      CurvePoint(input: 192, output: 215), // Tăng sáng mạnh vùng highlight
+      CurvePoint(input: 64, output: 45), // Dìm cực sâu vùng shadow tạo khối bóng
+      CurvePoint(input: 128, output: 122), // Dìm nhẹ lower-midtones tạo chiều sâu màu
+      CurvePoint(input: 192, output: 218), // Kéo sáng mạnh highlight tạo độ tương phản cao
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(ke100, "KE100_RICH_NEG", 60);
 
-  // 10. KG200 (Warm Negative - Kodak Gold 200 Emulation)
+  // 3. KG200 (Warm Negative - Kodak Gold 200 Emulation)
   // - Base Profile: STANDARD (0x0001)
   // - Sharpening: +2
-  // - Saturation: +1 (ấm áp)
-  // - Hue: -2 (tone màu vàng ấm cổ điển)
-  // - Curve: Midtone ấm, chuyển vùng mượt mà
+  // - Saturation: +2 (màu nắng rực rỡ)
+  // - Hue: -3 (ngả tone ấm màu vàng hổ phách rất mạnh)
+  // - Curve: Nâng nhẹ shadow và sáng dịu tạo cảm giác nắng ấm áp hoài cổ
   final kg200 = NcpFile()
     ..name = "Warm Neg KG200"
     ..baseProfileId = 0x0001
     ..sharpening = 130
-    ..saturation = 129
-    ..hue = 126 // 128 - 2 (lệch tone ấm)
+    ..saturation = 130 // 128 + 2
+    ..hue = 125 // 128 - 3
     ..curvePoints = [
-      CurvePoint(input: 0, output: 0),
-      CurvePoint(input: 64, output: 58),
-      CurvePoint(input: 128, output: 130), // Nâng nhẹ vùng trung tính ấm
-      CurvePoint(input: 192, output: 196),
+      CurvePoint(input: 0, output: 4), // Nâng nhẹ điểm tối để shadow bớt bết đen
+      CurvePoint(input: 64, output: 56), // Dìm shadow nhẹ
+      CurvePoint(input: 128, output: 132), // Nâng midtone tạo cảm giác nắng ấm tràn ngập
+      CurvePoint(input: 192, output: 194),
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(kg200, "KG200_WARM_NEG", 100);
 
-  // 11. NC100 (Classic Negative - Fujifilm Superia Emulation)
+  // 4. NC100 (Classic Negative - Fujifilm Superia Emulation)
   // - Base Profile: NEUTRAL (0x03C2)
   // - Sharpening: +3
-  // - Saturation: -1 (màu trầm, lạnh ở vùng shadow)
-  // - Curve: Shadows cực sâu kết hợp highlight nổi bật
+  // - Saturation: -2 (màu lặng trầm mặc đặc trưng)
+  // - Hue: +1 (tone màu xanh lục hơi lạnh ở vùng shadow)
+  // - Curve: Đường tương phản sâu kết hợp highlight nổi bật
   final nc100 = NcpFile()
     ..name = "Classic Neg NC100"
     ..baseProfileId = 0x03C2
     ..sharpening = 131
-    ..saturation = 127
+    ..saturation = 126 // 128 - 2
+    ..hue = 129 // 128 + 1
     ..curvePoints = [
-      CurvePoint(input: 0, output: 0),
-      CurvePoint(input: 50, output: 36), // Ép shadow sâu tạo khối sắc sảo
-      CurvePoint(input: 128, output: 125), // Dìm nhẹ lower-midtones
-      CurvePoint(input: 192, output: 206), // Đẩy highlight cao sáng rõ
+      CurvePoint(input: 0, output: 2), // Lift đen cực nhẹ
+      CurvePoint(input: 50, output: 34), // Ép shadow sâu tạo tương phản đậm nét
+      CurvePoint(input: 128, output: 122), // Dìm midtone tạo vẻ trầm lắng
+      CurvePoint(input: 192, output: 210), // Kéo sáng vùng highlight nổi bật
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(nc100, "NC100_CLASSIC_NEG", 90);
 
-  // 12. CC200 (Classic Positive - Fujifilm Chrome Emulation)
+  // 5. CC200 (Classic Positive - Fujifilm Chrome Emulation)
   // - Base Profile: NEUTRAL (0x03C2)
   // - Sharpening: +3
-  // - Saturation: -2 (Màu lặng, ít rực rỡ nhưng chiều sâu lớn)
-  // - Curve: S-curve trầm mặc
+  // - Saturation: -4 (độ bão hòa cực thấp cho phong cách phim trong trẻo)
+  // - Hue: +3 (xoay tone tạo bầu trời xanh cyan/lạnh trong vắt)
+  // - Curve: S-curve nhẹ trong suốt, trung tính và mượt mà
   final cc200 = NcpFile()
     ..name = "Classic Pos CC200"
     ..baseProfileId = 0x03C2
     ..sharpening = 131
-    ..saturation = 126
+    ..saturation = 124 // 128 - 4
+    ..hue = 131 // 128 + 3
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
-      CurvePoint(input: 64, output: 52),
-      CurvePoint(
-        input: 128,
-        output: 120,
-      ), // Dìm sáng midtone cho ảnh đậm chất trầm mặc
-      CurvePoint(input: 192, output: 200),
+      CurvePoint(input: 64, output: 48), // Dìm shadow nhẹ tạo khối sắc nét
+      CurvePoint(input: 128, output: 126), // Midtones trung tính trong suốt
+      CurvePoint(input: 192, output: 208), // Highlights sáng trong vắt sạch sẽ
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(cc200, "CC200_CLASSIC_POS", 110);
 
-  // 13. NN400 (Nostalgic Negative - Fujifilm Nostalgic Neg)
+  // 6. NN400 (Nostalgic Negative - Fujifilm Nostalgic Neg)
   // - Base Profile: NEUTRAL (0x03C2)
   // - Sharpening: +2
   // - Saturation: +0
-  // - Hue: -1 (ngả vàng hổ phách nhẹ)
-  // - Curve: Điểm đen nâng cao (matte look), nén trắng tạo sắc hổ phách vàng ấm vùng sáng
+  // - Hue: -2 (ngả vàng/nâu hổ phách đậm chất hoài cổ)
+  // - Curve: Nâng điểm đen cực cao (matte look), nén highlights tạo sắc hổ phách cổ kính
   final nn400 = NcpFile()
     ..name = "Nostalgic Neg NN400"
     ..baseProfileId = 0x03C2
     ..sharpening = 130
-    ..hue = 127 // 128 - 1 (vàng ấm)
+    ..saturation = 128
+    ..hue = 126 // 128 - 2
     ..curvePoints = [
-      CurvePoint(input: 0, output: 14), // Matte shadow nhẹ nhàng
-      CurvePoint(input: 64, output: 70), // Làm mềm vùng tối trung tính
-      CurvePoint(input: 128, output: 130), // Nâng nhẹ midtone tạo nước ảnh ấm
-      CurvePoint(
-        input: 192,
-        output: 188,
-      ), // Nén vùng highlight tạo sắc hổ phách cổ
-      CurvePoint(input: 255, output: 250), // Hạ nhẹ điểm trắng tối đa
+      CurvePoint(input: 0, output: 16), // Nâng shadow cực cao tạo lớp phủ mờ đục cổ điển
+      CurvePoint(input: 64, output: 72), // Làm mềm vùng tối trung tính
+      CurvePoint(input: 128, output: 130), // Midtone trầm ấm màu trà cổ
+      CurvePoint(input: 192, output: 185), // Nén highlights rất phẳng tránh chói
+      CurvePoint(input: 255, output: 245), // Hạ mạnh điểm trắng tối đa tạo tone hổ phách ấm
     ];
   writeProfile(nn400, "NN400_NOSTALGIC_NEG", 130);
+
+  // 7. HARCOURT_VIBRANT (Harcourt Vibrant Studio - Luminous & Vivid Portrait Style)
+  // - Base Profile: PORTRAIT (0x0486)
+  // - Sharpening: +4 (làm rõ nét chi tiết và vân da)
+  // - Saturation: +2 (màu sắc sinh động, rực rỡ nhưng tự nhiên)
+  // - Curve: Nâng sáng mạnh midtone và highlights để tạo vẻ rực rỡ, phát sáng (radiant/luminous look)
+  final harcourtVibrant = NcpFile()
+    ..name = "Harcourt Vibrant"
+    ..baseProfileId = 0x0486
+    ..sharpening = 132
+    ..saturation = 130 // 128 + 2
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 0),
+      CurvePoint(input: 50, output: 42), // Shadow sâu vừa phải
+      CurvePoint(input: 128, output: 134), // Đẩy sáng vùng da (midtones)
+      CurvePoint(input: 195, output: 215), // Tăng độ phát sáng vùng highlight (luminous)
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(harcourtVibrant, "HARCOURT_VIBRANT", 90);
+
+  // 8. HARCOURT_CLASSIC (Harcourt Classic Studio - Dramatic Black & White Style)
+  // - Base Profile: MONOCHROME (0x064D)
+  // - Sharpening: +5 (độ sắc nét cực cao làm nổi bật vân da và khối cơ mặt)
+  // - Filter: OFF (Kính lọc màu: Tắt)
+  // - Toning: B/W (0x00) (Đen trắng chuẩn nghệ thuật)
+  // - Curve: Độ tương phản cực gắt, dìm sâu shadow tạo nền đen và đẩy sáng highlight tạo hiệu ứng ánh sáng spotlight
+  final harcourtClassic = NcpFile()
+    ..name = "Harcourt Classic"
+    ..baseProfileId = 0x064D
+    ..sharpening = 133
+    ..filter = 0
+    ..toning = 0
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 0),
+      CurvePoint(input: 40, output: 16), // Crush shadow sâu để dìm nền tối
+      CurvePoint(input: 128, output: 120), // Giữ midtone trầm
+      CurvePoint(input: 180, output: 220), // Kích sáng cực mạnh highlight tạo độ tương phản spotlight nghệ thuật
+      CurvePoint(input: 255, output: 255),
+    ];
+  writeProfile(harcourtClassic, "HARCOURT_CLASSIC", 30);
+
+  // 9. HARCOURT_COLOUR (Harcourt Colour Studio - Muted & Warm Soft Glow Style)
+  // - Base Profile: PORTRAIT (0x0486)
+  // - Sharpening: +1 (mềm mại, giảm gai góc)
+  // - Saturation: -3 (màu lặng hoài cổ)
+  // - Hue: -2 (tone màu vàng ấm áp tinh tế)
+  // - Curve: Lift nhẹ shadow và nén highlights tạo hiệu ứng soft glow dịu nhẹ mướt mắt
+  final harcourtColour = NcpFile()
+    ..name = "Harcourt Colour"
+    ..baseProfileId = 0x0486
+    ..sharpening = 129
+    ..saturation = 125 // 128 - 3
+    ..hue = 126 // 128 - 2
+    ..curvePoints = [
+      CurvePoint(input: 0, output: 10), // Lift nhẹ đen tạo hiệu ứng mờ mịn
+      CurvePoint(input: 64, output: 70), // Shadow mềm mượt
+      CurvePoint(input: 128, output: 130), // Midtone sáng dịu
+      CurvePoint(input: 192, output: 190), // Nén highlights tạo sắc độ dịu mắt
+      CurvePoint(input: 255, output: 250), // Hạ nhẹ điểm trắng để làm mịn ảnh
+    ];
+  writeProfile(harcourtColour, "HARCOURT_COLOUR", 120);
 
   // Tạo file zip cho thư mục CUSTOMPC
   createZipArchive();
