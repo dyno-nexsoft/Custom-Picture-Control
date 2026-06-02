@@ -35,10 +35,10 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add CUSTOMPC/ previews/
+          git add CUSTOMPC/ doc/
           
           # Chỉ commit và push khi thực sự có thay đổi
-          if [ -n "$(git status --porcelain CUSTOMPC/ previews/)" ]; then
+          if [ -n "$(git status --porcelain CUSTOMPC/ doc/)" ]; then
             git commit -m "chore: tự động cập nhật bộ lọc màu .NCP và ảnh xem trước [skip ci]"
             git push
           else

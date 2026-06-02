@@ -279,10 +279,10 @@ void writeProfile(NcpFile ncp, String baseName, int blackOffset) {
   final bytes = ncp.toBytes();
 
   Directory('CUSTOMPC').createSync(recursive: true);
-  Directory('previews').createSync(recursive: true);
+  Directory('doc').createSync(recursive: true);
 
   // Tạo ảnh ColorChecker gốc dạng JPEG chất lượng cao nếu chưa tồn tại
-  final origFile = File('previews/colorchecker_original.jpg');
+  final origFile = File('doc/colorchecker_original.jpg');
   late img_lib.Image originalImage;
   if (!origFile.existsSync()) {
     originalImage = createColorChecker();
@@ -294,7 +294,7 @@ void writeProfile(NcpFile ncp, String baseName, int blackOffset) {
 
   // Áp dụng bộ lọc và lưu ảnh xem trước
   final previewImage = applyNcpToImage(originalImage, ncp);
-  final previewFile = File('previews/$baseName.jpg');
+  final previewFile = File('doc/$baseName.jpg');
   previewFile.writeAsBytesSync(img_lib.encodeJpg(previewImage, quality: 95));
   print("Đã tạo hình ảnh xem trước: ${previewFile.path}");
 
@@ -338,9 +338,11 @@ void main() {
     ..saturation = 125 // 128 - 3
     ..hue = 130 // 128 + 2
     ..curvePoints = [
-      CurvePoint(input: 0, output: 12), // Lift mạnh điểm đen tạo hiệu ứng mờ sương
+      CurvePoint(
+          input: 0, output: 12), // Lift mạnh điểm đen tạo hiệu ứng mờ sương
       CurvePoint(input: 64, output: 74), // Làm sáng mạnh shadow
-      CurvePoint(input: 128, output: 138), // Làm sáng vùng da (midtones) trong trẻo
+      CurvePoint(
+          input: 128, output: 138), // Làm sáng vùng da (midtones) trong trẻo
       CurvePoint(input: 192, output: 195), // Nén highlights dịu mắt
       CurvePoint(input: 255, output: 255),
     ];
@@ -360,9 +362,13 @@ void main() {
     ..hue = 127 // 128 - 1
     ..curvePoints = [
       CurvePoint(input: 0, output: 0),
-      CurvePoint(input: 64, output: 45), // Dìm cực sâu vùng shadow tạo khối bóng
-      CurvePoint(input: 128, output: 122), // Dìm nhẹ lower-midtones tạo chiều sâu màu
-      CurvePoint(input: 192, output: 218), // Kéo sáng mạnh highlight tạo độ tương phản cao
+      CurvePoint(
+          input: 64, output: 45), // Dìm cực sâu vùng shadow tạo khối bóng
+      CurvePoint(
+          input: 128, output: 122), // Dìm nhẹ lower-midtones tạo chiều sâu màu
+      CurvePoint(
+          input: 192,
+          output: 218), // Kéo sáng mạnh highlight tạo độ tương phản cao
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(ke100, "KE100_RICH_NEG", 60);
@@ -380,9 +386,12 @@ void main() {
     ..saturation = 130 // 128 + 2
     ..hue = 125 // 128 - 3
     ..curvePoints = [
-      CurvePoint(input: 0, output: 4), // Nâng nhẹ điểm tối để shadow bớt bết đen
+      CurvePoint(
+          input: 0, output: 4), // Nâng nhẹ điểm tối để shadow bớt bết đen
       CurvePoint(input: 64, output: 56), // Dìm shadow nhẹ
-      CurvePoint(input: 128, output: 132), // Nâng midtone tạo cảm giác nắng ấm tràn ngập
+      CurvePoint(
+          input: 128,
+          output: 132), // Nâng midtone tạo cảm giác nắng ấm tràn ngập
       CurvePoint(input: 192, output: 194),
       CurvePoint(input: 255, output: 255),
     ];
@@ -443,11 +452,16 @@ void main() {
     ..saturation = 128
     ..hue = 126 // 128 - 2
     ..curvePoints = [
-      CurvePoint(input: 0, output: 16), // Nâng shadow cực cao tạo lớp phủ mờ đục cổ điển
+      CurvePoint(
+          input: 0,
+          output: 16), // Nâng shadow cực cao tạo lớp phủ mờ đục cổ điển
       CurvePoint(input: 64, output: 72), // Làm mềm vùng tối trung tính
       CurvePoint(input: 128, output: 130), // Midtone trầm ấm màu trà cổ
-      CurvePoint(input: 192, output: 185), // Nén highlights rất phẳng tránh chói
-      CurvePoint(input: 255, output: 245), // Hạ mạnh điểm trắng tối đa tạo tone hổ phách ấm
+      CurvePoint(
+          input: 192, output: 185), // Nén highlights rất phẳng tránh chói
+      CurvePoint(
+          input: 255,
+          output: 245), // Hạ mạnh điểm trắng tối đa tạo tone hổ phách ấm
     ];
   writeProfile(nn400, "NN400_NOSTALGIC_NEG", 130);
 
@@ -465,7 +479,9 @@ void main() {
       CurvePoint(input: 0, output: 0),
       CurvePoint(input: 50, output: 42), // Shadow sâu vừa phải
       CurvePoint(input: 128, output: 134), // Đẩy sáng vùng da (midtones)
-      CurvePoint(input: 195, output: 215), // Tăng độ phát sáng vùng highlight (luminous)
+      CurvePoint(
+          input: 195,
+          output: 215), // Tăng độ phát sáng vùng highlight (luminous)
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(harcourtVibrant, "HARCOURT_VIBRANT", 90);
@@ -486,7 +502,10 @@ void main() {
       CurvePoint(input: 0, output: 0),
       CurvePoint(input: 40, output: 16), // Crush shadow sâu để dìm nền tối
       CurvePoint(input: 128, output: 120), // Giữ midtone trầm
-      CurvePoint(input: 180, output: 220), // Kích sáng cực mạnh highlight tạo độ tương phản spotlight nghệ thuật
+      CurvePoint(
+          input: 180,
+          output:
+              220), // Kích sáng cực mạnh highlight tạo độ tương phản spotlight nghệ thuật
       CurvePoint(input: 255, output: 255),
     ];
   writeProfile(harcourtClassic, "HARCOURT_CLASSIC", 30);
